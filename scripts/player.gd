@@ -52,32 +52,39 @@ func get_next_attack():
 func attack():
 	if state != STATES.ATTACK_1:
 		state = STATES.ATTACK_1
+		
+
+func change_state(next_state):
+	if state != next_state or state != STATES.ATTACK_1 or state != STATES.ATTACK_2 or state != STATES.ATTACK_3:
+		state = next_state
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	if Input.is_action_pressed("attack"):
 		attack()
 	elif Input.is_action_pressed("right") or Input.is_action_pressed("left") or Input.is_action_pressed("up") or Input.is_action_pressed("down"):
-		state = STATES.RUN
+		change_state(STATES.RUN)
 	else:
-		state = STATES.IDLE
+		change_state(STATES.IDLE)
 		
 	change_animation()
 
 var velocity = Vector2()
 
 func get_input():
+	
 	velocity = Vector2()
-	if Input.is_action_pressed('right'):
-		velocity.x += 1
-		set_direction(DIRECTION_RIGHT)
-	if Input.is_action_pressed('left'):
-		velocity.x -= 1
-		set_direction(DIRECTION_LEFT)
-	if Input.is_action_pressed('down'):
-		velocity.y += 1
-	if Input.is_action_pressed('up'):
-		velocity.y -= 1
+	if state != STATES.ATTACK_1:
+		if Input.is_action_pressed('right'):
+			velocity.x += 1
+			set_direction(DIRECTION_RIGHT)
+		if Input.is_action_pressed('left'):
+			velocity.x -= 1
+			set_direction(DIRECTION_LEFT)
+		if Input.is_action_pressed('down'):
+			velocity.y += 1
+		if Input.is_action_pressed('up'):
+			velocity.y -= 1
     
 	velocity = velocity.normalized() * speed
 
