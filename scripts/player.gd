@@ -1,5 +1,7 @@
 extends KinematicBody2D
 
+enum STATES {IDLE, RUN, JUMP, ATTACK_1, ATTACK_2, ATTACK_3}
+var state = null
 
 export (int) var speed = 200
 
@@ -16,13 +18,51 @@ func set_direction(player_direction):
 func _ready():
 	pass
 	
+var ANIMS = {
+	Idle = STATES.IDLE,
+	Run = STATES.RUN,
+	Attack1 = STATES.ATTACK_1,
+	Attack2 = STATES.ATTACK_2,
+	Attack3 = STATES.ATTACK_3,
+}
+
+func change_animation():
+	var next = null
+	for animation in $Animations.get_children():
+		var a = ANIMS.get(animation.name)
+		if a != null and state == a:
+			next = animation
+		else:
+			animation.hide()
+	if next != null:
+		next.show()
+		$AnimationPlayer.play(next.name)
+
+func get_next_attack():
+	var curr = $AnimationPlayer.current_animation
+	
+	if curr == ANIMS.attack_1:
+		return ANIMS.attack_2
+	if curr == ANIMS.attack_2:
+		return ANIMS.attack_3
+		
+	return ANIMS.attack_1
+	
+	
+func attack():
+	if state != STATES.ATTACK_1:
+		state = STATES.ATTACK_1
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	
-	if Input.is_action_pressed("right") or Input.is_action_pressed("left") or Input.is_action_pressed("up") or Input.is_action_pressed("down"):
-		$AnimatedSprite.play("Run")
+	if Input.is_action_pressed("attack"):
+		attack()
+	elif Input.is_action_pressed("right") or Input.is_action_pressed("left") or Input.is_action_pressed("up") or Input.is_action_pressed("down"):
+		state = STATES.RUN
 	else:
-		$AnimatedSprite.play("Idle")
+		state = STATES.IDLE
+		
+	change_animation()
 
 var velocity = Vector2()
 
