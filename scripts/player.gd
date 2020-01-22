@@ -17,7 +17,7 @@ func set_direction(player_direction):
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass
-	
+
 var ANIMS = {
 	Idle = STATES.IDLE,
 	Run = STATES.RUN,
@@ -40,22 +40,26 @@ func change_animation():
 
 func get_next_attack():
 	var curr = $AnimationPlayer.current_animation
-	
+
 	if curr == ANIMS.attack_1:
 		return ANIMS.attack_2
 	if curr == ANIMS.attack_2:
 		return ANIMS.attack_3
-		
+
 	return ANIMS.attack_1
-	
-	
+
+func end_attack():
+	if Input.is_action_pressed("attack"):
+		state = get_next_attack()
+	else:
+		state = STATES.IDLE
+
 func attack():
 	if state != STATES.ATTACK_1:
 		state = STATES.ATTACK_1
-		
 
 func change_state(next_state):
-	if state != next_state or state != STATES.ATTACK_1 or state != STATES.ATTACK_2 or state != STATES.ATTACK_3:
+	if state != next_state and state != STATES.ATTACK_1 and state != STATES.ATTACK_2 and state != STATES.ATTACK_3:
 		state = next_state
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -66,13 +70,12 @@ func _process(delta):
 		change_state(STATES.RUN)
 	else:
 		change_state(STATES.IDLE)
-		
+
 	change_animation()
 
 var velocity = Vector2()
 
 func get_input():
-	
 	velocity = Vector2()
 	if state != STATES.ATTACK_1:
 		if Input.is_action_pressed('right'):
@@ -85,7 +88,7 @@ func get_input():
 			velocity.y += 1
 		if Input.is_action_pressed('up'):
 			velocity.y -= 1
-    
+
 	velocity = velocity.normalized() * speed
 
 func _physics_process(delta):
